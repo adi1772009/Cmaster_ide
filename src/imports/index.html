@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#121214] text-zinc-100 font-sans select-none">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cmaster - BY ADITECH SOLUTIONS</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+
+    <!-- CodeMirror Core CSS & CDN Themes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/nord.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/solarized.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/twilight.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/gruvbox-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/eclipse.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-darker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/idea.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/hint/show-hint.min.js"></script>
+
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main, #121214); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color, #27272a); border-radius: 4px; }
+        
+        .CodeMirror {
+            height: 100% !important;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 16px;
+            border-radius: 0 0 0.75rem 0.75rem;
+            background-color: var(--bg-card, #18181b) !important;
+            color: var(--text-main, #f4f4f5) !important;
+            border: 1px solid var(--border-color, #27272a);
+            border-top: none;
+        }
+
+        .CodeMirror-hints {
+            position: absolute !important;
+            background-color: var(--bg-card, #18181b) !important;
+            border: 1px solid var(--border-color, #27272a) !important;
+            border-radius: 0.5rem !important;
+            z-index: 999999 !important;
+            max-height: 200px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+        }
+        .CodeMirror-hint {
+            color: var(--text-main, #f4f4f5) !important;
+            padding: 6px 10px !important;
+            font-family: monospace;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        li.CodeMirror-hint-active {
+            background-color: var(--accent, #22c55e) !important;
+            color: #ffffff !important;
+        }
+
+        .viking-title {
+            font-family: 'Cinzel Decorative', 'Cinzel', serif;
+            letter-spacing: 0.2px;
+            text-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+        }
+
+        .viking-subtext {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+        }
+
+        .text-viking-gradient {
+            background: linear-gradient(180deg, #86efac 0%, #22c55e 60%, #15803d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .theme-green { --accent: #22c55e; --accent-hover: #16a34a; --bg-main: #121214; --bg-card: #18181b; --bg-sub: #202024; --text-main: #f4f4f5; --border-color: #27272a; }
+        .theme-orange-light { --accent: #f97316; --accent-hover: #ea580c; --bg-main: #ffffff; --bg-card: #f4f4f5; --bg-sub: #e4e4e7; --text-main: #09090b; --border-color: #d4d4d8; }
+        .theme-cyan { --accent: #06b6d4; --accent-hover: #0891b2; --bg-main: #083344; --bg-card: #0e4a5f; --bg-sub: #155e75; --text-main: #ecfeff; --border-color: #164e63; }
+        .theme-purple { --accent: #a855f7; --accent-hover: #9333ea; --bg-main: #0f0716; --bg-card: #1a0b2e; --bg-sub: #261042; --text-main: #faf5ff; --border-color: #3b1466; }
+        .theme-crimson { --accent: #f43f5e; --accent-hover: #e11d48; --bg-main: #18050a; --bg-card: #2b0912; --bg-sub: #3f0d1b; --text-main: #fff1f2; --border-color: #4c0d1e; }
+        .theme-amber { --accent: #f59e0b; --accent-hover: #d97706; --bg-main: #140d02; --bg-card: #261a05; --bg-sub: #382607; --text-main: #fffbeb; --border-color: #452e06; }
+        
+        .accent-bg { background-color: var(--accent) !important; }
+        .accent-bg:hover { background-color: var(--accent-hover) !important; }
+        .accent-text { color: var(--accent) !important; }
+        .app-bg { background-color: var(--bg-main) !important; color: var(--text-main) !important; }
+        .card-bg { background-color: var(--bg-card) !important; }
+        .sub-bg { background-color: var(--bg-sub) !important; }
+        .border-theme { border-color: var(--border-color) !important; }
+    </style>
+</head>
+<body id="app-root" class="h-full flex flex-col overflow-hidden theme-green app-bg">
+
+    <header class="h-14 sm:h-16 card-bg border-b border-theme flex items-center justify-between px-2 sm:px-6 flex-shrink-0 gap-2 overflow-hidden">
+        <div class="flex flex-col justify-center min-w-0 flex-shrink pr-1">
+            <h1 class="viking-title text-[15px] sm:text-lg md:text-xl leading-none font-black text-viking-gradient truncate uppercase">
+                Cmaster
+            </h1>
+            <span class="viking-subtext text-[8px] sm:text-[11px] font-bold text-emerald-400 opacity-90 leading-tight uppercase tracking-wider truncate mt-0.5">
+                BY ADITECH SOLUTIONS
+            </span>
+        </div>
+
+        <div class="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
+            <nav class="flex items-center space-x-1">
+                <button id="nav-project" onclick="switchNav('Project')" class="nav-btn accent-bg text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md font-bold text-[11px] sm:text-xs">Project</button>
+                <button id="nav-settings" onclick="switchNav('Settings')" class="nav-btn sub-bg hover:opacity-80 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md font-bold text-[11px] sm:text-xs">Settings</button>
+            </nav>
+            <button onclick="runCode()" class="accent-bg text-white font-bold px-3 sm:px-4 py-1 sm:py-1.5 rounded-md flex items-center gap-1 text-[11px] sm:text-xs shadow-md">
+                <span>▶</span> <span>Run</span>
+            </button>
+        </div>
+    </header>
+
+    <div id="sub-action-bar" class="h-10 sm:h-11 sub-bg border-b border-theme flex items-center px-2 sm:px-6 space-x-2 overflow-x-auto flex-shrink-0"></div>
+
+    <main class="flex-1 relative overflow-hidden flex flex-col">
+        
+        <div id="view-editor" class="flex-1 flex flex-col h-full">
+            <div id="file-status-bar" class="sub-bg px-3 py-1 text-[11px] font-mono border-b border-theme flex justify-between items-center text-zinc-400">
+                <span id="current-filename">Active File: main.c</span>
+                <span id="save-indicator" class="text-xs text-emerald-400">✓ Ready</span>
+            </div>
+
+            <div id="file-tabs-bar" class="card-bg border-b border-theme flex items-center px-2 space-x-1 overflow-x-auto flex-shrink-0 h-9"></div>
+
+            <div class="flex-1 relative app-bg p-1.5 sm:p-3 overflow-hidden flex flex-col">
+                <textarea id="code-editor"></textarea>
+            </div>
+
+            <div class="h-11 sm:h-12 card-bg border-t border-theme flex items-center px-2 space-x-1.5 overflow-x-auto flex-shrink-0">
+                <button onclick="insertSymbol('{')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">{</button>
+                <button onclick="insertSymbol('}')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">}</button>
+                <button onclick="insertSymbol('(')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">(</button>
+                <button onclick="insertSymbol(')')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">)</button>
+                <button onclick="insertSymbol('<')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">&lt;</button>
+                <button onclick="insertSymbol('>')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">&gt;</button>
+                <button onclick="insertSymbol(';')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">;</button>
+                <button onclick="insertSymbol('#')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">#</button>
+                <button onclick="insertSymbol('->')" class="h-8 sm:h-9 min-w-[38px] sm:min-w-[44px] sub-bg font-mono font-bold rounded text-sm sm:text-base">-&gt;</button>
+                <button onclick="insertSymbol('&')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">&amp;</button>
+                <button onclick="insertSymbol('*')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">*</button>
+                <button onclick="insertSymbol('[')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">[</button>
+                <button onclick="insertSymbol(']')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">]</button>
+                <button onclick="insertSymbol('=')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">=</button>
+                <button onclick="insertSymbol('%')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">%</button>
+                <button onclick="insertSymbol('&quot;')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">"</button>
+                <button onclick="insertSymbol('\'')" class="h-8 sm:h-9 min-w-[32px] sm:min-w-[38px] sub-bg font-mono font-bold rounded text-sm sm:text-base">'</button>
+            </div>
+        </div>
+
+        <div id="view-files" class="hidden flex-1 p-4 md:p-8 overflow-y-auto app-bg">
+            <div class="max-w-3xl mx-auto card-bg border border-theme rounded-2xl p-6 space-y-6">
+                <div class="flex items-center justify-between border-b border-theme pb-4">
+                    <h2 class="text-xl font-bold flex items-center gap-2">📂 Local Directory Manager</h2>
+                    <button onclick="createNewFilePrompt()" class="accent-bg text-white text-xs font-bold px-3 py-2 rounded-lg">+ Create New File</button>
+                </div>
+
+                <div class="space-y-4">
+                    <label class="text-xs font-bold text-zinc-400 uppercase tracking-wider block">Storage Options</label>
+                    <input type="file" id="local-file-input" onchange="handleFileSelect(event)" class="hidden" accept=".c,.h,.txt">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button onclick="document.getElementById('local-file-input').click()" class="sub-bg border border-theme hover:opacity-80 font-bold px-3 py-3 rounded-xl text-left flex items-center justify-between">
+                            <span>📄 Open File</span>
+                            <span class="text-xs accent-text">Browse →</span>
+                        </button>
+                        <button onclick="saveActiveFileToDevice()" class="sub-bg border border-theme hover:opacity-80 font-bold px-3 py-3 rounded-xl text-left flex items-center justify-between">
+                            <span>💾 Save File</span>
+                            <span class="text-xs accent-text">Export →</span>
+                        </button>
+                        <button onclick="saveAsActiveFileToDevice()" class="sub-bg border border-theme hover:opacity-80 font-bold px-3 py-3 rounded-xl text-left flex items-center justify-between">
+                            <span>📝 Save As...</span>
+                            <span class="text-xs accent-text">Export →</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Open Files in Workspace</h3>
+                    <div id="workspace-files-list" class="space-y-2 text-sm font-mono"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-settings" class="hidden flex-1 p-4 md:p-8 overflow-y-auto app-bg">
+            <div class="max-w-2xl mx-auto card-bg border border-theme rounded-2xl p-6">
+                <h2 id="settings-title" class="text-xl font-bold mb-6">⚙ Appearance Settings</h2>
+                <div id="settings-content" class="space-y-6"></div>
+            </div>
+        </div>
+
+        <div id="console-panel" class="hidden absolute inset-0 card-bg z-20 flex flex-col p-4 md:p-6">
+            <div class="flex items-center justify-between pb-3 border-b border-theme mb-3">
+                <span class="accent-text font-mono font-bold flex items-center gap-2"><span>>_</span> Interactive Terminal (Native Clang/GCC Engine)</span>
+                <button onclick="closeConsole()" class="sub-bg text-sm px-3 py-1 rounded-md border border-theme">Close</button>
+            </div>
+
+            <div class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <pre id="console-output" class="flex-1 min-h-0 font-mono text-emerald-400 overflow-y-auto whitespace-pre-wrap leading-relaxed p-3.5 app-bg rounded-lg border border-theme text-sm"></pre>
+
+                <div id="terminal-input-row" class="flex items-center gap-2 mt-3 flex-shrink-0 app-bg border border-theme rounded-lg px-3 py-2">
+                    <span id="terminal-prompt" class="accent-text font-mono font-bold">&gt;</span>
+                    <input id="console-stdin" type="text"
+                        placeholder="Type input here and press Enter or click Send..."
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                        class="flex-1 bg-transparent font-mono text-sm text-zinc-200 outline-none">
+                    <button onclick="submitTerminalInput()" class="accent-bg text-white font-bold px-3 py-1.5 rounded-md text-xs">
+                        Send Input
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between gap-2 mt-2 flex-shrink-0">
+                    <span id="terminal-status-tip" class="text-[10px] font-mono text-amber-400">Program waiting for input... Type in box below.</span>
+                    <button onclick="runCode()" class="sub-bg border border-theme text-xs font-bold px-3 py-1.5 rounded-md whitespace-nowrap">
+                        ▶ Restart &amp; Run
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        let editorInstance;
+        let currentNav = 'Project';
+        let currentSettingsTab = 'Appearance';
+        
+        let editorFontSize = '16px';
+        let editorSyntaxTheme = 'dracula';
+        let terminalFontSize = 'text-sm';
+
+        // Check Electron/Node context
+        const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
+        let cp, fs, path, activeChildProcess = null;
+        if (isNode) {
+            cp = require('child_process');
+            fs = require('fs');
+            path = require('path');
+        }
+
+        const defaultFiles = [
+            {
+                name: "main.c",
+                content: `#include <stdio.h>\n#include <stdlib.h>\n\n// Native recursion test\nint factorial(int n) {\n    if (n <= 1) return 1;\n    return n * factorial(n - 1);\n}\n\nint main() {\n    printf("Native Clang/GCC Engine Ready!\\n");\n    int num;\n    printf("Enter number for factorial calculation: ");\n    fflush(stdout);\n    if (scanf("%d", &num) == 1) {\n        printf("Factorial of %d is: %d\\n", num, factorial(num));\n    }\n    return 0;\n}`,
+                output: ""
+            },
+            {
+                name: "helper.h",
+                content: `// Header File\n#define GREETING "Welcome to Cmaster IDE!"\n`,
+                output: ""
+            }
+        ];
+
+        let savedData = localStorage.getItem('cmaster_workspace');
+        let openFiles = savedData ? JSON.parse(savedData) : defaultFiles;
+        let activeFileIndex = 0;
+
+        function saveWorkspace() {
+            localStorage.setItem('cmaster_workspace', JSON.stringify(openFiles));
+            const indicator = document.getElementById('save-indicator');
+            if(indicator) {
+                indicator.innerText = "✓ Saved";
+                indicator.classList.remove('text-zinc-400');
+                indicator.classList.add('text-emerald-400');
+                setTimeout(() => { indicator.innerText = "✓ Ready"; }, 2000);
+            }
+        }
+
+        const autoClosePairs = { '(': ')', '[': ']', '{': '}', '<': '>', '"': '"', "'": "'" };
+
+        const cDictionary = [
+            { text: "printf", snippet: "printf(\"\");", offset: 2 },
+            { text: "scanf", snippet: "scanf(\"%d\", &);", offset: 2 },
+            { text: "fgets", snippet: "fgets(buf, sizeof(buf), stdin);", offset: 0 },
+            { text: "malloc", snippet: "malloc(sizeof());", offset: 2 },
+            { text: "free", snippet: "free(ptr);", offset: 0 },
+            { text: "strlen", snippet: "strlen(str)", offset: 0 },
+            { text: "#include", snippet: "#include <stdio.h>", offset: 0 },
+            { text: "#define", snippet: "#define ", offset: 0 },
+            { text: "return", snippet: "return 0;", offset: 0 },
+            { text: "for", snippet: "for (int i = 0; i < n; i++) {\n    \n}", offset: 2 },
+            { text: "while", snippet: "while (condition) {\n    \n}", offset: 2 },
+            { text: "if", snippet: "if (condition) {\n    \n}", offset: 2 },
+            { text: "else", snippet: "else {\n    \n}", offset: 0 },
+            { text: "int", snippet: "int ", offset: 0 },
+            { text: "void", snippet: "void ", offset: 0 }
+        ];
+
+        function cCustomHint(cm) {
+            const cursor = cm.getCursor();
+            const line = cm.getLine(cursor.line);
+            let start = cursor.ch;
+            while (start > 0 && /[\w#]/.test(line.charAt(start - 1))) {
+                start--;
+            }
+            const word = line.slice(start, cursor.ch);
+            if (!word || word.length < 1) return null;
+
+            const matches = cDictionary.filter(item => 
+                item.text.toLowerCase().startsWith(word.toLowerCase())
+            );
+
+            if (!matches.length) return null;
+
+            return {
+                list: matches.map(item => ({
+                    text: item.snippet,
+                    displayText: item.text,
+                    hint: function(cm, self) {
+                        cm.replaceRange(item.snippet, self.from, self.to);
+                        if (item.offset > 0) {
+                            const cur = cm.getCursor();
+                            cm.setCursor({ line: self.from.line, ch: cur.ch - item.offset });
+                        }
+                    }
+                })),
+                from: CodeMirror.Pos(cursor.line, start),
+                to: CodeMirror.Pos(cursor.line, cursor.ch)
+            };
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            editorInstance = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+                mode: 'text/x-csrc',
+                theme: editorSyntaxTheme,
+                lineNumbers: true,
+                indentUnit: 4,
+                tabSize: 4,
+                lineWrapping: true
+            });
+
+            editorInstance.setValue(openFiles[activeFileIndex].content);
+
+            editorInstance.on('change', (cm, changeObj) => {
+                openFiles[activeFileIndex].content = cm.getValue();
+                
+                clearTimeout(window.saveTimeout);
+                document.getElementById('save-indicator').innerText = "Typing...";
+                document.getElementById('save-indicator').classList.remove('text-emerald-400');
+                document.getElementById('save-indicator').classList.add('text-zinc-400');
+                window.saveTimeout = setTimeout(saveWorkspace, 1000);
+
+                if (changeObj.origin === 'setValue' || changeObj.origin === '+autoclose') return;
+
+                const textTyped = changeObj.text ? changeObj.text[0] : '';
+                if (changeObj.origin === '+input' && textTyped.length === 1 && autoClosePairs[textTyped]) {
+                    const closing = autoClosePairs[textTyped];
+                    const cursor = cm.getCursor();
+                    cm.replaceRange(closing, cursor, null, '+autoclose');
+                    cm.setCursor(cursor);
+                    return;
+                }
+
+                const cursor = cm.getCursor();
+                const line = cm.getLine(cursor.line);
+                let start = cursor.ch;
+                while (start > 0 && /[\w#]/.test(line.charAt(start - 1))) {
+                    start--;
+                }
+                const currentWord = line.slice(start, cursor.ch);
+
+                if (currentWord.length >= 1) {
+                    CodeMirror.showHint(cm, cCustomHint, {
+                        completeSingle: false,
+                        closeOnUnfocus: false,
+                        alignWithWord: true
+                    });
+                }
+            });
+
+            window.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                    e.preventDefault();
+                    saveWorkspace();
+                }
+            });
+
+            switchNav('Project');
+            renderFileTabs();
+        });
+
+        function renderFileTabs() {
+            const tabsBar = document.getElementById('file-tabs-bar');
+            tabsBar.innerHTML = openFiles.map((file, idx) => `
+                <button onclick="switchActiveFile(${idx})" class="${idx === activeFileIndex ? 'accent-bg text-white' : 'sub-bg text-zinc-300 hover:opacity-80'} text-xs font-mono font-bold px-3 py-1 rounded-t-lg flex items-center gap-2 border-t border-x border-theme whitespace-nowrap">
+                    <span>📄 ${file.name}</span>
+                    ${openFiles.length > 1 ? `<span onclick="event.stopPropagation(); closeFileTab(${idx})" class="hover:text-red-400 text-xs px-1">×</span>` : ''}
+                </button>
+            `).join('');
+            
+            const fileNameElem = document.getElementById('current-filename');
+            if (fileNameElem) {
+                fileNameElem.innerText = `Active File: ${openFiles[activeFileIndex].name}`;
+            }
+        }
+
+        function switchActiveFile(index) {
+            if (openFiles[activeFileIndex]) {
+                const currentOutput = document.getElementById('console-output').innerText;
+                if(currentOutput) openFiles[activeFileIndex].output = currentOutput;
+            }
+            
+            activeFileIndex = index;
+            editorInstance.setValue(openFiles[activeFileIndex].content);
+            document.getElementById('console-output').innerText = openFiles[activeFileIndex].output || '';
+            
+            renderFileTabs();
+            renderWorkspaceFilesList();
+            saveWorkspace();
+        }
+
+        function closeFileTab(index) {
+            if (openFiles.length <= 1) return;
+            openFiles.splice(index, 1);
+            if (activeFileIndex >= openFiles.length) {
+                activeFileIndex = openFiles.length - 1;
+            }
+            editorInstance.setValue(openFiles[activeFileIndex].content);
+            renderFileTabs();
+            renderWorkspaceFilesList();
+            saveWorkspace();
+        }
+
+        function createNewFilePrompt() {
+            const filename = prompt("Enter new C file name:", "new_file.c");
+            if (!filename) return;
+            openFiles.push({
+                name: filename,
+                content: `#include <stdio.h>\n\nint main() {\n    printf("New file initialized.\\n");\n    return 0;\n}`,
+                output: ""
+            });
+            switchActiveFile(openFiles.length - 1);
+            showProjectView('editor');
+            saveWorkspace();
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    openFiles.push({
+                        name: file.name,
+                        content: e.target.result,
+                        output: ""
+                    });
+                    switchActiveFile(openFiles.length - 1);
+                    showProjectView('editor');
+                    saveWorkspace();
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function downloadFile(filename, content) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+
+        function saveActiveFileToDevice() {
+            const activeFile = openFiles[activeFileIndex];
+            downloadFile(activeFile.name, activeFile.content);
+        }
+
+        function saveAsActiveFileToDevice() {
+            const activeFile = openFiles[activeFileIndex];
+            const newName = prompt("Save file as:", activeFile.name);
+            if (newName && newName.trim() !== "") {
+                const cleanName = newName.trim();
+                activeFile.name = cleanName;
+                renderFileTabs();
+                renderWorkspaceFilesList();
+                saveWorkspace();
+                downloadFile(cleanName, activeFile.content);
+            }
+        }
+
+        function switchNav(module) {
+            currentNav = module;
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = 'nav-btn sub-bg hover:opacity-80 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md font-bold text-[11px] sm:text-xs';
+            });
+            const activeBtn = document.getElementById(`nav-${module.toLowerCase()}`);
+            if (activeBtn) activeBtn.className = 'nav-btn accent-bg text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md font-bold text-[11px] sm:text-xs';
+
+            document.getElementById('view-editor').classList.add('hidden');
+            document.getElementById('view-files').classList.add('hidden');
+            document.getElementById('view-settings').classList.add('hidden');
+
+            if (module === 'Project') {
+                document.getElementById('view-editor').classList.remove('hidden');
+                renderProjectSubBar();
+                setTimeout(() => editorInstance.refresh(), 50);
+            } else if (module === 'Settings') {
+                document.getElementById('view-settings').classList.remove('hidden');
+                renderSettingsSubBar();
+                renderSettingsContent();
+            }
+        }
+
+        function renderProjectSubBar() {
+            const subBar = document.getElementById('sub-action-bar');
+            subBar.innerHTML = `
+                <button onclick="showProjectView('editor')" class="sub-bg hover:opacity-80 text-[11px] sm:text-xs font-bold px-2.5 py-1 rounded-md border border-theme whitespace-nowrap">Code Editor</button>
+                <button onclick="showProjectView('files')" class="sub-bg hover:opacity-80 text-[11px] sm:text-xs font-bold px-2.5 py-1 rounded-md border border-theme whitespace-nowrap">Local Files</button>
+            `;
+        }
+
+        function renderWorkspaceFilesList() {
+            const listContainer = document.getElementById('workspace-files-list');
+            if (!listContainer) return;
+            listContainer.innerHTML = openFiles.map((file, idx) => `
+                <div class="p-3 sub-bg rounded-xl border border-theme flex justify-between items-center">
+                    <span class="font-bold">${file.name} ${idx === activeFileIndex ? '(Active)' : ''}</span>
+                    <button onclick="switchActiveFile(${idx}); showProjectView('editor');" class="text-xs accent-text font-bold">Open Tab →</button>
+                </div>
+            `).join('');
+        }
+
+        function showProjectView(view) {
+            document.getElementById('view-editor').classList.add('hidden');
+            document.getElementById('view-files').classList.add('hidden');
+            document.getElementById(`view-${view}`).classList.remove('hidden');
+            if (view === 'editor') setTimeout(() => editorInstance.refresh(), 50);
+            if (view === 'files') renderWorkspaceFilesList();
+        }
+
+        function renderSettingsSubBar() {
+            const subBar = document.getElementById('sub-action-bar');
+            const tabs = ['Appearance', 'Editor', 'Terminal', 'About Application'];
+            subBar.innerHTML = tabs.map(tab => `
+                <button onclick="switchSettingsTab('${tab}')" class="${currentSettingsTab === tab ? 'accent-bg text-white' : 'sub-bg hover:opacity-80'} text-[11px] sm:text-xs font-bold px-2.5 py-1 rounded-md whitespace-nowrap border border-theme">
+                    ${tab}
+                </button>
+            `).join('');
+        }
+
+        function switchSettingsTab(tabName) {
+            currentSettingsTab = tabName;
+            renderSettingsSubBar();
+            renderSettingsContent();
+        }
+
+        function renderSettingsContent() {
+            const title = document.getElementById('settings-title');
+            const container = document.getElementById('settings-content');
+            title.innerText = `⚙ ${currentSettingsTab}`;
+
+            if (currentSettingsTab === 'Appearance') {
+                container.innerHTML = `
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold block">App Color Schemes</label>
+                        <select onchange="changeTheme(this.value)" class="w-full sub-bg p-3 rounded-xl border border-theme outline-none text-sm">
+                            <option value="theme-green" selected>Emerald Green (Default)</option>
+                            <option value="theme-orange-light">Orange / Bright White</option>
+                            <option value="theme-cyan">Deep Cyan Cyber</option>
+                            <option value="theme-purple">Royal Purple Dark</option>
+                            <option value="theme-crimson">Crimson Red</option>
+                            <option value="theme-amber">Amber Gold</option>
+                        </select>
+                    </div>
+                `;
+            } else if (currentSettingsTab === 'Editor') {
+                container.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold block">Editor Font Size</label>
+                            <select onchange="changeFontSize(this.value)" class="w-full sub-bg p-3 rounded-xl border border-theme outline-none text-sm">
+                                <option value="8px" ${editorFontSize === '8px' ? 'selected' : ''}>8 pt</option>
+                                <option value="10px" ${editorFontSize === '10px' ? 'selected' : ''}>10 pt</option>
+                                <option value="12px" ${editorFontSize === '12px' ? 'selected' : ''}>12 pt</option>
+                                <option value="14px" ${editorFontSize === '14px' ? 'selected' : ''}>14 pt</option>
+                                <option value="16px" ${editorFontSize === '16px' ? 'selected' : ''}>16 pt (Default)</option>
+                                <option value="18px" ${editorFontSize === '18px' ? 'selected' : ''}>18 pt</option>
+                                <option value="20px" ${editorFontSize === '20px' ? 'selected' : ''}>20 pt</option>
+                                <option value="24px" ${editorFontSize === '24px' ? 'selected' : ''}>24 pt</option>
+                                <option value="28px" ${editorFontSize === '28px' ? 'selected' : ''}>28 pt</option>
+                                <option value="36px" ${editorFontSize === '36px' ? 'selected' : ''}>36 pt</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold block">Syntax Highlighting Theme</label>
+                            <select onchange="changeSyntaxTheme(this.value)" class="w-full sub-bg p-3 rounded-xl border border-theme outline-none text-sm">
+                                <option value="dracula" ${editorSyntaxTheme === 'dracula' ? 'selected' : ''}>Dracula Dark</option>
+                                <option value="monokai" ${editorSyntaxTheme === 'monokai' ? 'selected' : ''}>Monokai Classic</option>
+                                <option value="material" ${editorSyntaxTheme === 'material' ? 'selected' : ''}>Material Ocean</option>
+                                <option value="nord" ${editorSyntaxTheme === 'nord' ? 'selected' : ''}>Nord Cold Blue</option>
+                                <option value="solarized" ${editorSyntaxTheme === 'solarized' ? 'selected' : ''}>Solarized Dark</option>
+                                <option value="gruvbox-dark" ${editorSyntaxTheme === 'gruvbox-dark' ? 'selected' : ''}>Gruvbox Retro Dark</option>
+                                <option value="idea" ${editorSyntaxTheme === 'idea' ? 'selected' : ''}>IntelliJ IDEA Light</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            } else if (currentSettingsTab === 'Terminal') {
+                container.innerHTML = `
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold block">Terminal Font Size</label>
+                        <select onchange="changeTerminalFontSize(this.value)" class="w-full sub-bg p-3 rounded-xl border border-theme outline-none text-sm">
+                            <option value="text-xs" ${terminalFontSize === 'text-xs' ? 'selected' : ''}>12px - Compact</option>
+                            <option value="text-sm" ${terminalFontSize === 'text-sm' ? 'selected' : ''}>14px - Standard</option>
+                            <option value="text-base" ${terminalFontSize === 'text-base' ? 'selected' : ''}>16px - Medium</option>
+                            <option value="text-lg" ${terminalFontSize === 'text-lg' ? 'selected' : ''}>18px - Large</option>
+                        </select>
+                    </div>
+                `;
+            } else if (currentSettingsTab === 'About Application') {
+                container.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="sub-bg p-5 rounded-2xl border border-theme space-y-4 text-sm leading-relaxed">
+                            <h3 class="text-base font-bold accent-text flex items-center gap-2">
+                                <span>⚡</span> Native C Desktop Execution Engine
+                            </h3>
+                            <p>
+                                <strong>Cmaster</strong> runs natively via Electron/Neutralinojs. Your C source code is compiled locally using GCC/Clang with direct hardware speed, supporting unlimited stack recursion, dynamic allocation, and standard POSIX system APIs.
+                            </p>
+                        </div>
+
+                        <div class="card-bg border border-theme rounded-2xl p-5 space-y-5">
+                            <h3 class="text-lg font-bold flex items-center gap-2">
+                                <span>✉️</span> Contact Us
+                            </h3>
+                            <div class="space-y-4 text-xs font-bold uppercase tracking-wider">
+                                <div>
+                                    <label class="block mb-1.5 text-zinc-300">YOUR NAME</label>
+                                    <input id="contact-name" type="text" placeholder="Enter your full name" 
+                                           class="w-full sub-bg p-3 rounded-xl border border-theme outline-none font-normal normal-case text-sm text-zinc-100">
+                                </div>
+                                <div>
+                                    <label class="block mb-1.5 text-zinc-300">YOUR EMAIL</label>
+                                    <input id="contact-email" type="email" placeholder="Enter your email address" 
+                                           class="w-full sub-bg p-3 rounded-xl border border-theme outline-none font-normal normal-case text-sm text-zinc-100">
+                                </div>
+                                <div>
+                                    <label class="block mb-1.5 text-zinc-300">YOUR MESSAGE</label>
+                                    <textarea id="contact-message" rows="4" placeholder="Share your thoughts or feedback..." 
+                                              class="w-full sub-bg p-3 rounded-xl border border-theme outline-none font-normal normal-case text-sm text-zinc-100"></textarea>
+                                </div>
+                                <button onclick="sendContactMail()" class="w-full accent-bg text-white font-bold py-3 rounded-xl text-sm capitalize">
+                                    Send Message
+                                </button>
+                            </div>
+
+                            <div class="border-t border-theme pt-5 mt-4 space-y-3 text-xs">
+                                <div class="font-bold text-zinc-400 uppercase text-[10px]">DEVELOPER</div>
+                                <div class="text-sm font-semibold text-zinc-100">Aditya Lakhani | alakhani2009@gmail.com | +91 94260 27727</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function changeTheme(themeName) {
+            document.getElementById('app-root').className = `h-full flex flex-col overflow-hidden ${themeName} app-bg`;
+        }
+
+        function changeFontSize(size) {
+            editorFontSize = size;
+            const cmElement = document.querySelector('.CodeMirror');
+            if (cmElement) {
+                cmElement.style.fontSize = size;
+                editorInstance.refresh();
+            }
+        }
+
+        function changeSyntaxTheme(theme) {
+            editorSyntaxTheme = theme;
+            editorInstance.setOption('theme', theme);
+        }
+
+        function changeTerminalFontSize(sizeClass) {
+            terminalFontSize = sizeClass;
+            const output = document.getElementById('console-output');
+            if (output) {
+                output.className = `flex-1 min-h-0 font-mono text-emerald-400 overflow-y-auto whitespace-pre-wrap leading-relaxed p-3.5 app-bg rounded-lg border border-theme ${sizeClass}`;
+            }
+        }
+
+        function sendContactMail() {
+            const name = document.getElementById('contact-name').value.trim();
+            const email = document.getElementById('contact-email').value.trim();
+            const message = document.getElementById('contact-message').value.trim();
+
+            if (!name || !email || !message) {
+                alert('Please fill out all fields before sending.');
+                return;
+            }
+
+            const recipient = "alakhani2009@gmail.com";
+            const subject = encodeURIComponent(`Cmaster Feedback from ${name}`);
+            const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+
+            window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${recipient}&su=${subject}&body=${body}`, '_blank');
+        }
+
+        function insertSymbol(symbol) {
+            const doc = editorInstance.getDoc();
+            const cursor = doc.getCursor();
+            
+            if (autoClosePairs[symbol]) {
+                const closing = autoClosePairs[symbol];
+                doc.replaceRange(symbol + closing, cursor);
+                doc.setCursor({ line: cursor.line, ch: cursor.ch + 1 });
+            } else {
+                doc.replaceRange(symbol, cursor);
+            }
+            
+            editorInstance.focus();
+        }
+
+        // --- STDIN WRITER FOR NATIVE PROCESS ---
+        function submitTerminalInput() {
+            const input = document.getElementById('console-stdin');
+            if (!input) return;
+            const value = input.value;
+            input.value = '';
+
+            const output = document.getElementById('console-output');
+            output.innerText += value + "\n";
+
+            if (isNode && activeChildProcess) {
+                activeChildProcess.stdin.write(value + "\n");
+            }
+        }
+
+        /* Direct Compilation and Native Execution Bridge */
+        async function runCode() {
+            const output = document.getElementById('console-output');
+            output.innerText = "";
+            output.style.color = '#34d399';
+            document.getElementById('console-panel').classList.remove('hidden');
+
+            const activeFile = openFiles[activeFileIndex];
+            const code = activeFile.content;
+
+            if (!isNode) {
+                output.style.color = '#f59e0b';
+                output.innerText = "[BROWSER WARNING]: Running in web mode. Launch inside Electron/Neutralino desktop app for true GCC/Clang native execution.\n----------------------------------------\n";
+                return;
+            }
+
+            // Kill previous running binary process if any
+            if (activeChildProcess) {
+                activeChildProcess.kill();
+                activeChildProcess = null;
+            }
+
+            const tempDir = require('os').tmpdir();
+            const sourcePath = path.join(tempDir, activeFile.name);
+            const isWin = process.platform === 'win32';
+            const binPath = path.join(tempDir, isWin ? 'cmaster_out.exe' : 'cmaster_out');
+
+            // Write all open C files to temporary folder
+            openFiles.forEach(f => {
+                fs.writeFileSync(path.join(tempDir, f.name), f.content);
+            });
+
+            output.innerText = "Compiling with local Clang/GCC...\n";
+
+            // Execute local GCC/Clang command line compiler
+            const compiler = 'gcc';
+            cp.exec(`${compiler} "${sourcePath}" -o "${binPath}"`, (compileErr, stdout, stderr) => {
+                if (compileErr || stderr) {
+                    output.style.color = '#f87171';
+                    output.innerText = "Compilation Failed:\n\n" + (stderr || compileErr.message);
+                    return;
+                }
+
+                output.innerText = "Compilation Successful! Running Native Process...\n----------------------------------------\n";
+                
+                // Spawn native executable process
+                activeChildProcess = cp.spawn(binPath, [], { cwd: tempDir });
+
+                activeChildProcess.stdout.on('data', (data) => {
+                    output.innerText += data.toString();
+                    output.scrollTop = output.scrollHeight;
+                });
+
+                activeChildProcess.stderr.on('data', (data) => {
+                    output.style.color = '#f87171';
+                    output.innerText += "\n[Runtime Error]: " + data.toString();
+                });
+
+                activeChildProcess.on('close', (code) => {
+                    output.innerText += `\n----------------------------------------\nProcess finished with exit code ${code}.`;
+                    activeChildProcess = null;
+                    openFiles[activeFileIndex].output = output.innerText;
+                    saveWorkspace();
+                });
+            });
+        }
+
+        function closeConsole() {
+            if (activeChildProcess) {
+                activeChildProcess.kill();
+                activeChildProcess = null;
+            }
+            document.getElementById('console-panel').classList.add('hidden');
+        }
+
+        document.addEventListener('keydown', (event) => {
+            const input = document.getElementById('console-stdin');
+            if (!input || document.activeElement !== input) return;
+
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                submitTerminalInput();
+            }
+        });
+    </script>
+</body>
+</html>

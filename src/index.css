@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@700;900&display=swap');
+@import 'tailwindcss';
+
+html, body, #root {
+  height: 100%;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-main, #121214); }
+::-webkit-scrollbar-thumb { background: var(--border-color, #27272a); border-radius: 4px; }
+
+.theme-green { --accent: #22c55e; --accent-hover: #16a34a; --bg-main: #121214; --bg-card: #18181b; --bg-sub: #202024; --text-main: #f4f4f5; --border-color: #27272a; }
+.theme-orange-light { --accent: #f97316; --accent-hover: #ea580c; --bg-main: #ffffff; --bg-card: #f4f4f5; --bg-sub: #e4e4e7; --text-main: #09090b; --border-color: #d4d4d8; }
+.theme-cyan { --accent: #06b6d4; --accent-hover: #0891b2; --bg-main: #083344; --bg-card: #0e4a5f; --bg-sub: #155e75; --text-main: #ecfeff; --border-color: #164e63; }
+.theme-purple { --accent: #a855f7; --accent-hover: #9333ea; --bg-main: #0f0716; --bg-card: #1a0b2e; --bg-sub: #261042; --text-main: #faf5ff; --border-color: #3b1466; }
+.theme-crimson { --accent: #f43f5e; --accent-hover: #e11d48; --bg-main: #18050a; --bg-card: #2b0912; --bg-sub: #3f0d1b; --text-main: #fff1f2; --border-color: #4c0d1e; }
+.theme-amber { --accent: #f59e0b; --accent-hover: #d97706; --bg-main: #140d02; --bg-card: #261a05; --bg-sub: #382607; --text-main: #fffbeb; --border-color: #452e06; }
+
+.accent-bg { background-color: var(--accent) !important; }
+.accent-bg:hover { background-color: var(--accent-hover) !important; }
+.accent-text { color: var(--accent) !important; }
+.app-bg { background-color: var(--bg-main) !important; color: var(--text-main) !important; }
+.card-bg { background-color: var(--bg-card) !important; }
+.sub-bg { background-color: var(--bg-sub) !important; }
+.border-theme { border-color: var(--border-color) !important; }
+
+.viking-title {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  text-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+}
+.viking-subtext {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 1px;
+}
+.text-viking-gradient {
+  background: linear-gradient(180deg, #86efac 0%, #22c55e 60%, #15803d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cm-editor {
+  height: 100% !important;
+  font-size: 16px;
+}
+.cm-scroller { overflow: auto !important; }
+
+/* Autocomplete Popup Styling */
+.cm-tooltip-autocomplete {
+  background-color: var(--bg-card, #18181b) !important;
+  border: 1px solid var(--border-color, #27272a) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+  overflow: hidden !important;
+  max-height: 280px !important;
+  font-family: 'Consolas', 'Courier New', monospace !important;
+  z-index: 9999 !important;
+}
+
+.cm-tooltip-autocomplete > ul {
+  max-height: 260px !important;
+  font-size: 13px !important;
+}
+
+.cm-tooltip-autocomplete > ul > li {
+  padding: 5px 10px !important;
+  border-radius: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  color: var(--text-main, #f4f4f5) !important;
+}
+
+.cm-tooltip-autocomplete > ul > li[aria-selected] {
+  background-color: var(--accent, #22c55e) !important;
+  color: #ffffff !important;
+}
+
+.cm-completionIcon {
+  opacity: 0.8 !important;
+  margin-right: 4px !important;
+  font-size: 11px !important;
+}
+
+.cm-completionLabel {
+  font-weight: 600 !important;
+}
+
+.cm-completionDetail {
+  font-style: normal !important;
+  opacity: 0.65 !important;
+  font-size: 11px !important;
+  margin-left: auto !important;
+  padding-left: 8px !important;
+}
+
+.cm-completionMatchedText {
+  color: var(--accent, #22c55e) !important;
+  text-decoration: underline !important;
+  font-weight: 700 !important;
+}
+
+.cm-tooltip-autocomplete > ul > li[aria-selected] .cm-completionMatchedText {
+  color: #ffffff !important;
+}
+
+.cm-tooltip-autocomplete > ul > li[aria-selected] .cm-completionDetail {
+  opacity: 0.9 !important;
+  color: #ffffff !important;
+}
+

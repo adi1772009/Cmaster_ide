@@ -1,0 +1,19 @@
+{
+  "name": "Cmaster IDE - Offline C Programming",
+  "short_name": "Cmaster",
+  "description": "Offline C Programming IDE and Compiler by ADITECH SOLUTIONS",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#121214",
+  "theme_color": "#22c55e",
+  "categories": ["education", "developer tools", "productivity"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

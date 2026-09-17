@@ -1,0 +1,10 @@
+{
+  "description": "Runs complex recursive and heavy programs offline on mobile devices, enabling developers to test and execute code efficiently without internet access.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
