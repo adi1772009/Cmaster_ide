@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Cmaster</string>
+    <string name="title_activity_main">Cmaster</string>
+    <string name="package_name">com.aditech.cmaster</string>
+    <string name="custom_url_scheme">com.aditech.cmaster</string>
+</resources>
