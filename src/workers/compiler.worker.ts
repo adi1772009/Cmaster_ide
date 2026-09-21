@@ -1,6 +1,5 @@
 /// <reference lib="webworker" />
 
-// Robust import for JSCPP supporting both ESM and CommonJS
 // @ts-expect-error - JSCPP types
 import * as JSCPPModule from 'JSCPP'
 
@@ -42,11 +41,11 @@ addEventListener('message', (e: MessageEvent) => {
     let formattedError = `\n[Runtime Error]: ${msg}`
 
     if (msg.includes('Maximum call stack size exceeded')) {
-      formattedError = `\n[Recursion Stack Overflow]: Call stack exceeded!\nCheck that your recursive function has a terminating base case and does not exceed maximum call depth.`
+      formattedError = `\n[Recursion Stack Overflow]: Call stack depth limit reached!\nCheck that your recursive function has a valid base case that terminates.`
     } else if (msg.toLowerCase().includes('timeout') || msg.toLowerCase().includes('time limit')) {
-      formattedError = `\n[Execution Timeout]: Program ran for more than 60 seconds and was stopped.\nIf computing large recursive states (e.g. naive Fibonacci), check your loop or recursion termination condition.`
+      formattedError = `\n[Execution Timeout]: Program exceeded the 60-second runtime limit.\nIf running heavy recursion (e.g. naive Fibonacci), ensure the recursion reaches its base case efficiently.`
     } else if (msg.toLowerCase().includes('input stream is empty') || msg.toLowerCase().includes('eof')) {
-      formattedError = `\n[Input Stream Empty]: The program called 'scanf', but no input was provided.\n💡 Tip: Pre-fill your input in the Stdin box in the Terminal before clicking Run.`
+      formattedError = `\n[Input Stream Empty]: 'scanf' requested input, but none was provided.\n💡 Tip: Provide your input in Settings → Terminal (Stdin) before running.`
     }
 
     postMessage({ type: 'error', text: formattedError })
