@@ -65,6 +65,11 @@ jobs:
           
           npx cap sync android
 
+          # Generate complete offline C bundle and runtime datasets (70-90MB standalone payload)
+          if [ -f "scripts/generate_offline_c_bundle.py" ]; then
+            python3 scripts/generate_offline_c_bundle.py
+          fi
+
       - name: Ensure Valid Gradle Wrapper
         run: |
           chmod +x android/gradlew
