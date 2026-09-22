@@ -17,6 +17,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
+          lfs: true
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
@@ -64,6 +65,20 @@ jobs:
           
           npx cap sync android
 
+      - name: Ensure Valid Gradle Wrapper
+        run: |
+          chmod +x android/gradlew
+          JAR_PATH="android/gradle/wrapper/gradle-wrapper.jar"
+          if [ ! -f "$JAR_PATH" ] || [ $(wc -c < "$JAR_PATH") -lt 10000 ]; then
+            echo "Gradle wrapper jar is missing or too small, pulling via git lfs or regenerating..."
+            git lfs pull --include="$JAR_PATH" || true
+          fi
+          if [ ! -f "$JAR_PATH" ] || [ $(wc -c < "$JAR_PATH") -lt 10000 ]; then
+            echo "Regenerating wrapper with gradle..."
+            gradle wrapper --project-dir android || true
+          fi
+          ls -la android/gradle/wrapper/
+
       - name: Commit Native Android Project to Repository
         run: |
           git config --global user.name "github-actions[bot]"
@@ -73,9 +88,6 @@ jobs:
             git commit -m "chore: persist native Android project with custom Cmaster icons"
             git push origin ${{ github.ref_name }}
           fi
-
-      - name: Grant Execute Permission for Gradlew
-        run: chmod +x android/gradlew
 
       - name: Build Android Debug APK
         run: |
@@ -104,15 +116,12 @@ jobs:
           body: |
             ## Cmaster IDE v1.0.0 for Android 🚀
             
-            Offline Mobile C Programming IDE with custom branding and icons.
+            Offline Mobile C Programming IDE.
             
             ### What's Included:
             - **100% Offline C Execution Engine**: Run complex C code, pointers, data structures, and deep recursion (Tower of Hanoi, QuickSort, N-Queens, Binary Search Trees) directly on device without internet or remote servers.
-            - **Full Device File Access**:
-              - **Save** (`Ctrl+S`): Writes directly to the open file in device internal storage.
-              - **Save As** (`Ctrl+Shift+S`): Prompts to save the entire source code as a new `.c` file anywhere on device.
-              - **Open**: Directly opens existing `.c`/`.h` files from device storage.
-            - **Intelligent Autocomplete & Mobile Symbol Toolbar**: Fast typing with C keywords, stdlib functions, code snippets, and quick symbol insertion.
+            - **Intelligent Autocomplete**: Full C language keyword, stdlib, snippet completions, and document symbol suggestions in the editor.
+            - **Full Device File Access**: Save, Save As, and Open files directly on your device storage.
             - **Interactive Console & Stdin**: Real-time terminal with live user input bar and 60-second runtime limit with recursion stack overflow detection.
             
             ### Download:
