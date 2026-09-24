@@ -71,6 +71,8 @@ export default function App() {
   const [consoleIsError, setConsoleIsError] = useState(false)
   const [stdinInput, setStdinInput] = useState('')
   const [isRunning, setIsRunning] = useState(false)
+  const [isWaitingForInput, setIsWaitingForInput] = useState(false)
+  const [liveInputValue, setLiveInputValue] = useState('')
   const [syntaxTheme, setSyntaxTheme] = useState<SyntaxTheme>('dracula')
   const [editorFontSize, setEditorFontSize] = useState(16)
   const [termFontSize, setTermFontSize] = useState(14)
@@ -80,6 +82,26 @@ export default function App() {
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const outputRef = useRef<HTMLPreElement>(null)
   const editorViewRef = useRef<EditorView | null>(null)
+  const liveInputRef = useRef<HTMLInputElement>(null)
+
+  const sabRef = useRef<SharedArrayBuffer | null>(null)
+  const sabStatusRef = useRef<Int32Array | null>(null)
+  const sabLengthRef = useRef<Int32Array | null>(null)
+  const sabCharBufferRef = useRef<Uint8Array | null>(null)
+
+  useEffect(() => {
+    if (typeof SharedArrayBuffer !== 'undefined') {
+      try {
+        const sab = new SharedArrayBuffer(1024)
+        sabRef.current = sab
+        sabStatusRef.current = new Int32Array(sab, 0, 1)
+        sabLengthRef.current = new Int32Array(sab, 4, 1)
+        sabCharBufferRef.current = new Uint8Array(sab, 8, 1016)
+      } catch (e) {
+        console.warn('SharedArrayBuffer not available:', e)
+      }
+    }
+  }, [])
 
   const activeFile = files[Math.min(activeIdx, files.length - 1)]
 
@@ -94,13 +116,21 @@ export default function App() {
     if (type === 'output') {
       setConsoleOutput(p => p + text)
       scrollOutput()
+    } else if (type === 'stdin_request') {
+      setIsWaitingForInput(true)
+      scrollOutput()
+      requestAnimationFrame(() => {
+        liveInputRef.current?.focus()
+      })
     } else if (type === 'done') {
       setConsoleOutput(p => p + `\n${'─'.repeat(40)}\nProcess exited with code ${exitCode}.`)
       setIsRunning(false)
+      setIsWaitingForInput(false)
     } else if (type === 'error') {
       setConsoleOutput(p => p + text)
       setConsoleIsError(true)
       setIsRunning(false)
+      setIsWaitingForInput(false)
     }
   }, [])
 
@@ -241,13 +271,39 @@ export default function App() {
       source = source.replace(/#include\s*<limits\.h>/g, '// Shimming limits.h\n#define INT_MAX 2147483647\n#define INT_MIN -2147483648\n')
     }
 
-    workerRef.current.postMessage({ type: 'run', code: source, stdin: stdinInput })
+    workerRef.current.postMessage({
+      type: 'run',
+      code: source,
+      stdin: stdinInput,
+      sab: sabRef.current,
+    })
+  }
+
+  const handleSendLiveInput = (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    if (!isWaitingForInput) return
+    const inputToSend = liveInputValue + '\n'
+    setConsoleOutput(p => p + liveInputValue + '\n')
+    scrollOutput()
+
+    if (sabStatusRef.current && sabLengthRef.current && sabCharBufferRef.current) {
+      const enc = new TextEncoder().encode(inputToSend)
+      sabLengthRef.current[0] = enc.length
+      sabCharBufferRef.current.set(enc)
+      Atomics.store(sabStatusRef.current, 0, 1)
+      Atomics.notify(sabStatusRef.current, 0, 1)
+    }
+
+    setLiveInputValue('')
+    setIsWaitingForInput(false)
   }
 
   const stopCode = () => {
     workerRef.current?.terminate()
     setConsoleOutput(p => p + '\n[Stopped by user.]')
     setIsRunning(false)
+    setIsWaitingForInput(false)
+    setLiveInputValue('')
     workerRef.current = spawnWorker()
   }
 
