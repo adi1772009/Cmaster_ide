@@ -75,7 +75,8 @@ export default function App() {
   const [liveInputValue, setLiveInputValue] = useState('')
   const [syntaxTheme, setSyntaxTheme] = useState<SyntaxTheme>('dracula')
   const [editorFontSize, setEditorFontSize] = useState(16)
-  const [termFontSize, setTermFontSize] = useState(14)
+  const [termFontSize, setTermFontSize] = useState(15)
+  const [isTerminalMaximized, setIsTerminalMaximized] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'ready' | 'typing' | 'saved'>('ready')
 
   const workerRef = useRef<Worker | null>(null)
@@ -362,7 +363,7 @@ export default function App() {
 
         {/* EDITOR */}
         {nav === 'Project' && projectView === 'editor' && (
-          <div className={`flex flex-col min-h-0 ${consoleOpen ? 'flex-[0_0_55%]' : 'flex-1'}`}>
+          <div className={`flex flex-col min-h-0 ${consoleOpen ? (isTerminalMaximized ? 'hidden' : 'flex-[0_0_28%]') : 'flex-1'}`}>
             <div className="sub-bg px-3 py-1 text-[11px] font-mono border-b border-theme flex justify-between items-center text-zinc-400 flex-shrink-0">
               <span>Active: {activeFile?.name}</span>
               <span className={`text-xs ${saveLabelColor}`}>{saveLabel}</span>
@@ -493,8 +494,8 @@ export default function App() {
                     <label className="text-sm font-semibold block">Terminal Font Size</label>
                     <select value={termFontSize} onChange={e => setTermFontSize(Number(e.target.value))}
                       className="w-full sub-bg p-3 rounded-xl border border-theme outline-none text-sm">
-                      {[12,14,16,18].map(s => (
-                        <option key={s} value={s}>{s}px{s === 14 ? ' (Standard)' : ''}</option>
+                      {[12,14,15,16,18,20,24].map(s => (
+                        <option key={s} value={s}>{s}px{s === 15 ? ' (Default)' : ''}</option>
                       ))}
                     </select>
                   </div>
@@ -520,7 +521,7 @@ export default function App() {
                   <div className="sub-bg p-5 rounded-2xl border border-theme space-y-3 text-sm leading-relaxed">
                     <h3 className="text-base font-bold accent-text flex items-center gap-2">⚡ Offline WASM C Engine</h3>
                     <p><strong>Cmaster</strong> uses JSCPP — a full C interpreter running entirely in your browser/device with zero server calls. It supports recursion, dynamic allocation, and standard C library I/O. Works completely offline after the first load.</p>
-                    <p className="text-xs text-zinc-400">Cmaster Mark 3 · SafeFormat Engine · Editor: CodeMirror 6 · 100% Offline</p>
+                    <p className="text-xs text-zinc-400">Cmaster Mark 4 · SafeFormat Engine · Editor: CodeMirror 6 · 100% Offline</p>
                   </div>
 
                   <ContactForm />
@@ -532,9 +533,9 @@ export default function App() {
 
         {/* TERMINAL PANEL */}
         {consoleOpen && (
-          <div className={`flex flex-col card-bg border-t border-theme ${nav === 'Project' && projectView === 'editor' ? 'flex-1 min-h-0' : 'absolute inset-0 z-20'} p-4`}>
+          <div className={`flex flex-col card-bg border-t border-theme ${nav === 'Project' && projectView === 'editor' && !isTerminalMaximized ? 'flex-1 min-h-0' : 'absolute inset-0 z-20'} p-3.5 sm:p-4`}>
             <div className="flex items-center justify-between pb-3 border-b border-theme mb-3 flex-shrink-0">
-              <span className="accent-text font-mono font-bold flex items-center gap-2 text-sm">
+              <span className="accent-text font-mono font-bold flex items-center gap-2 text-sm sm:text-base">
                 &gt;_ Terminal
                 {isRunning && (
                   <span className="text-xs text-amber-400 animate-pulse">
@@ -542,16 +543,24 @@ export default function App() {
                   </span>
                 )}
               </span>
-              <div className="flex gap-2">
-                {isRunning && <button onClick={stopCode} className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-md">■ Stop</button>}
-                <button onClick={runCode} disabled={isRunning} className="accent-bg text-white text-xs font-bold px-3 py-1 rounded-md disabled:opacity-50">▶ Run</button>
-                <button onClick={() => setConsoleOpen(false)} className="sub-bg text-xs px-3 py-1 rounded-md border border-theme">✕</button>
+              <div className="flex gap-1.5 sm:gap-2 items-center">
+                {isRunning && <button onClick={stopCode} className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-md">■ Stop</button>}
+                <button onClick={runCode} disabled={isRunning} className="accent-bg text-white text-xs font-bold px-3 py-1.5 rounded-md disabled:opacity-50">▶ Run</button>
+                <button
+                  onClick={() => setIsTerminalMaximized(m => !m)}
+                  title={isTerminalMaximized ? 'Restore View' : 'Maximize Terminal'}
+                  className="sub-bg text-xs font-bold px-2.5 py-1.5 rounded-md border border-theme hover:opacity-80 flex items-center gap-1"
+                >
+                  <span>{isTerminalMaximized ? '🗗' : '⛶'}</span>
+                  <span>{isTerminalMaximized ? 'Restore' : 'Maximize'}</span>
+                </button>
+                <button onClick={() => { setConsoleOpen(false); setIsTerminalMaximized(false) }} className="sub-bg text-xs px-2.5 py-1.5 rounded-md border border-theme hover:opacity-80">✕</button>
               </div>
             </div>
 
             <pre
               ref={outputRef}
-              className="flex-1 min-h-0 font-mono overflow-y-auto whitespace-pre-wrap leading-relaxed p-3.5 app-bg rounded-lg border border-theme"
+              className="flex-1 min-h-0 font-mono overflow-y-auto whitespace-pre-wrap leading-relaxed p-4 app-bg rounded-xl border border-theme shadow-inner tracking-wide"
               style={{ color: consoleIsError ? '#f87171' : '#34d399', fontSize: `${termFontSize}px` }}
             >
               {consoleOutput || 'Click ▶ Run to execute.\n\nTip: You can enter scanf inputs live in the terminal or pre-fill in Settings → Terminal.'}
@@ -559,21 +568,21 @@ export default function App() {
 
             {isWaitingForInput && (
               <form onSubmit={handleSendLiveInput} className="mt-3 flex items-center gap-2 flex-shrink-0">
-                <div className="flex-1 flex items-center sub-bg rounded-xl border border-emerald-400/80 px-3 py-2 shadow-md focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-400/30">
-                  <span className="text-emerald-400 font-mono text-sm font-bold mr-2 select-none">&gt;</span>
+                <div className="flex-1 flex items-center sub-bg rounded-xl border-2 border-emerald-400/90 px-3.5 py-2.5 shadow-lg focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-400/30">
+                  <span className="text-emerald-400 font-mono text-base font-bold mr-2 select-none">&gt;</span>
                   <input
                     ref={liveInputRef}
                     type="text"
                     value={liveInputValue}
                     onChange={e => setLiveInputValue(e.target.value)}
                     placeholder="Enter input here (scanf) and tap Send..."
-                    className="w-full bg-transparent outline-none text-sm font-mono text-white placeholder:text-zinc-500"
+                    className="w-full bg-transparent outline-none text-sm sm:text-base font-mono text-white placeholder:text-zinc-500"
                     autoFocus
                   />
                 </div>
                 <button
                   type="submit"
-                  className="accent-bg text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition-all"
+                  className="accent-bg text-white font-bold px-4 py-3 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-md active:scale-95 transition-all"
                 >
                   <span>Send</span>
                   <span>↵</span>
