@@ -22,3 +22,4 @@ Offline Mobile App Deployment/
 what_you_did/
 *.dat
 android/app/src/main/assets/offline_c_bundle/offline_runtime_core/
+*.apk
