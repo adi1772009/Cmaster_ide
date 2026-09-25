@@ -520,7 +520,7 @@ export default function App() {
                   <div className="sub-bg p-5 rounded-2xl border border-theme space-y-3 text-sm leading-relaxed">
                     <h3 className="text-base font-bold accent-text flex items-center gap-2">⚡ Offline WASM C Engine</h3>
                     <p><strong>Cmaster</strong> uses JSCPP — a full C interpreter running entirely in your browser/device with zero server calls. It supports recursion, dynamic allocation, and standard C library I/O. Works completely offline after the first load.</p>
-                    <p className="text-xs text-zinc-400">Engine: JSCPP v2 · Editor: CodeMirror 6 · Built with React + Vite</p>
+                    <p className="text-xs text-zinc-400">Cmaster Mark 3 · SafeFormat Engine · Editor: CodeMirror 6 · 100% Offline</p>
                   </div>
 
                   <ContactForm />

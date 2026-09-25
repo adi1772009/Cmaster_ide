@@ -103,40 +103,68 @@ jobs:
         run: |
           ls -la android/app/build/outputs/apk/debug/
           test -f android/app/build/outputs/apk/debug/app-debug.apk
-          cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/Cmaster-Mark-2.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk "android/app/build/outputs/apk/debug/mark 3.apk"
+          cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/mark-3.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/Cmaster-Mark-3.apk
           cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/Cmaster.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Cmaster-Mark-2-APK
-          path: android/app/build/outputs/apk/debug/Cmaster-Mark-2.apk
+          name: Cmaster-Mark-3-APK
+          path: android/app/build/outputs/apk/debug/mark-3.apk
           retention-days: 30
+
+      - name: Purge Older GitHub Releases
+        if: github.ref == 'refs/heads/main'
+        run: |
+          node -e '
+            const token = process.env.GITHUB_TOKEN;
+            const headers = { "Authorization": "token " + token, "User-Agent": "Cmaster-Build" };
+            fetch("https://api.github.com/repos/${{ github.repository }}/releases", { headers })
+              .then(r => r.json())
+              .then(async rels => {
+                if (Array.isArray(rels)) {
+                  for (const rel of rels) {
+                    if (rel.tag_name !== "mark-3") {
+                      console.log("Deleting old release: " + rel.id + " (" + rel.tag_name + ")");
+                      await fetch("https://api.github.com/repos/${{ github.repository }}/releases/" + rel.id, { method: "DELETE", headers });
+                      await fetch("https://api.github.com/repos/${{ github.repository }}/git/refs/tags/" + rel.tag_name, { method: "DELETE", headers }).catch(() => {});
+                    }
+                  }
+                }
+              }).catch(err => console.error(err));
+          '
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v2.0.0
-          name: "Cmaster Offline C IDE Mark 2 (Android APK)"
+          tag_name: mark-3
+          name: "Cmaster Mark 3"
           body: |
-            ## Cmaster IDE Mark 2 (v2.0.0) for Android 🚀
+            ## Cmaster IDE Mark 3 for Android 🚀
             
-            The Complete Offline Mobile C Programming IDE — Mark 2.
+            The Complete Standalone Offline Mobile C Programming IDE — Mark 3.
             
-            ### What's New in Mark 2:
-            - **Real-Time Interactive Terminal I/O**: Direct in-terminal input for `scanf`, `getchar`, and `gets`! Programs prompt interactively and continue execution upon pressing Enter.
+            ### What's New in Mark 3:
+            - **Zero Runtime Errors**: Completely eliminated third-party printf dependencies with a native, zero-dependency safe formatting engine. No stream/instanceof errors ever.
+            - **Real-Time Interactive Terminal I/O**: Direct in-terminal input for `scanf`, `getchar`, and `gets`! Prompts live and continues execution immediately upon pressing Enter / Send.
             - **Universal Generator-Based Execution Engine**: Zero dependency on SharedArrayBuffer or cross-origin headers — works on 100% of Android devices and WebViews.
             - **Complex Recursion & Data Structures**: Tower of Hanoi, QuickSort with pointer arithmetic, N-Queens backtracking, Binary Search Trees, and dynamic memory.
             - **Intelligent C Autocomplete**: CodeMirror 6 with C keywords, standard library headers, and smart snippet suggestions.
             - **100% Offline Standalone Package**: Self-contained APK (~73 MB) with complete C standard library headers, runtime datasets, and custom branding.
             
             ### Download:
-            Download **Cmaster-Mark-2.apk** (or **Cmaster.apk**) below and tap to install on your Android device.
+            Download **mark 3.apk** (or **mark-3.apk**) below and tap to install on your Android device.
           draft: false
           prerelease: false
           files: |
-            android/app/build/outputs/apk/debug/Cmaster-Mark-2.apk
+            android/app/build/outputs/apk/debug/mark 3.apk
+            android/app/build/outputs/apk/debug/mark-3.apk
+            android/app/build/outputs/apk/debug/Cmaster-Mark-3.apk
             android/app/build/outputs/apk/debug/Cmaster.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

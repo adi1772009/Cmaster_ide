@@ -1,5 +1,12 @@
 /// <reference lib="webworker" />
 
+// Global polyfill for Node stream to protect against any third-party code invoking `instanceof Stream`
+if (typeof self !== 'undefined') {
+  class StreamPolyfill {}
+  ;(self as any).Stream = StreamPolyfill
+  ;(self as any).stream = { Stream: StreamPolyfill }
+}
+
 // @ts-expect-error - JSCPP types
 import * as JSCPPModule from 'JSCPP'
 // @ts-expect-error - JSCPP types
@@ -31,6 +38,70 @@ function overrideFunc(rt: any, lt: any, name: string, args: any[], retType: any,
     }
   }
   rt.regFunc(impl, lt, name, args, retType)
+}
+
+function safeFormat(fmt: string, args: any[]): string {
+  let argIdx = 0
+  return fmt.replace(/%(-?\d+)?(?:\.(\d+))?([a-zA-Z%])/g, (match, width, prec, spec) => {
+    if (spec === '%') return '%'
+    if (argIdx >= args.length) return match
+    const val = args[argIdx++]
+    let str = ''
+    switch (spec) {
+      case 'd':
+      case 'i':
+      case 'ld':
+      case 'lld':
+        str = String(parseInt(val, 10) || 0)
+        break
+      case 'u':
+      case 'lu':
+      case 'llu':
+        str = String(Math.max(0, parseInt(val, 10) || 0))
+        break
+      case 'x':
+        str = (parseInt(val, 10) || 0).toString(16)
+        break
+      case 'X':
+        str = (parseInt(val, 10) || 0).toString(16).toUpperCase()
+        break
+      case 'o':
+        str = (parseInt(val, 10) || 0).toString(8)
+        break
+      case 'f':
+      case 'lf': {
+        const p = prec !== undefined ? parseInt(prec, 10) : 6
+        str = (parseFloat(val) || 0).toFixed(p)
+        break
+      }
+      case 'g':
+      case 'e':
+      case 'E': {
+        str = String(parseFloat(val) || 0)
+        break
+      }
+      case 'c':
+        str = typeof val === 'number' ? String.fromCharCode(val) : String(val)
+        break
+      case 's':
+        str = String(val !== undefined && val !== null ? val : '')
+        break
+      case 'p':
+        str = '0x' + (parseInt(val, 10) || 0).toString(16)
+        break
+      default:
+        str = String(val)
+    }
+    if (width) {
+      const w = parseInt(width, 10)
+      if (w > 0) {
+        str = str.padStart(w, ' ')
+      } else if (w < 0) {
+        str = str.padEnd(-w, ' ')
+      }
+    }
+    return str
+  })
 }
 
 let inputStream = ''
@@ -193,6 +264,96 @@ function registerInteractiveCstdio() {
     load(rt: any) {
       baseCstdio.load(rt)
       const char_pointer = rt.normalPointerType(rt.charTypeLiteral)
+      const { stdio } = rt.config
+
+      const _strcpy = (rt: any, _this: any, [target, src]: any[]) => {
+        const dest = target.v.target
+        const srcArr = src.v.target
+        const destPos = target.v.position || 0
+        const srcPos = src.v.position || 0
+        for (let i = 0; i < srcArr.length - srcPos; i++) {
+          dest[destPos + i] = srcArr[srcPos + i]
+        }
+      }
+
+      const format_type_map = function (rt: any, ctrl: string) {
+        switch (ctrl) {
+          case 'd':
+          case 'i':
+            return rt.intTypeLiteral
+          case 'u':
+          case 'o':
+          case 'x':
+          case 'X':
+            return rt.unsignedintTypeLiteral
+          case 'f':
+          case 'F':
+            return rt.floatTypeLiteral
+          case 'e':
+          case 'E':
+          case 'g':
+          case 'G':
+          case 'a':
+          case 'A':
+            return rt.doubleTypeLiteral
+          case 'c':
+            return rt.charTypeLiteral
+          case 's':
+            return rt.normalPointerType(rt.charTypeLiteral)
+          case 'p':
+            return rt.normalPointerType(rt.voidTypeLiteral)
+          default:
+            return rt.intTypeLiteral
+        }
+      }
+
+      const validate_format = function (rt: any, format: string, ...params: any[]) {
+        let i = 0
+        const re = /%(?:[-+ #0])?(?:[0-9]+|\*)?(?:\.(?:[0-9]+|\*))?([diuoxXfFeEgGaAcspn])/g
+        let ctrl: any
+        const result: any[] = []
+        while ((ctrl = re.exec(format)) != null) {
+          const type = format_type_map(rt, ctrl[1])
+          if (params.length <= i) {
+            rt.raiseException(`insufficient arguments (at least ${i + 1} is required)`)
+          }
+          const target = params[i++]
+          const casted = rt.cast(type, target)
+          if (rt.isStringType(casted)) {
+            result.push(rt.getStringFromCharArray(casted))
+          } else {
+            result.push(casted.v != null ? casted.v : 0)
+          }
+        }
+        return result
+      }
+
+      const __printf = function (format: any, ...params: any[]) {
+        if (rt.isStringType(format.t)) {
+          const formatStr = rt.getStringFromCharArray(format)
+          const parsed_params = validate_format(rt, formatStr, ...params)
+          const retval = safeFormat(formatStr, parsed_params)
+          return rt.makeCharArrayFromString(retval)
+        } else {
+          rt.raiseException('format must be a string')
+        }
+      }
+
+      const _printf = function (rt: any, _this: any, format: any, ...params: any[]) {
+        const retval = __printf(format, ...params)
+        const retvalStr = rt.getStringFromCharArray(retval)
+        stdio.write(retvalStr)
+        return rt.val(rt.intTypeLiteral, retval.v.target.length)
+      }
+
+      const _sprintf = function (rt: any, _this: any, target: any, format: any, ...params: any[]) {
+        const retval = __printf(format, ...params)
+        _strcpy(rt, null, [target, retval])
+        return rt.val(rt.intTypeLiteral, retval.v.target.length)
+      }
+
+      overrideFunc(rt, 'global', 'printf', [char_pointer, '?'], rt.intTypeLiteral, _printf)
+      overrideFunc(rt, 'global', 'sprintf', [char_pointer, char_pointer, '?'], rt.intTypeLiteral, _sprintf)
       overrideFunc(rt, 'global', 'scanf', [char_pointer, '?'], rt.intTypeLiteral, customScanf)
       overrideFunc(rt, 'global', 'getchar', [], rt.intTypeLiteral, function* (rt: any) {
         try {
