@@ -27,6 +27,14 @@ const ast: any = (astModule as any).default || astModule
 const preprocessor: any = (preprocessorModule as any).default || preprocessorModule
 const PEGUtil: any = (PEGUtilModule as any).default || PEGUtilModule
 
+import {
+  setupStandardHeaders,
+  extractAndRegisterStructs,
+  patchRuntime,
+  patchInterpreter,
+  prepareSourceCode
+} from './cStandardLibraries'
+
 function overrideFunc(rt: any, lt: any, name: string, args: any[], retType: any, impl: any) {
   const ltsig = rt.getTypeSignature(lt)
   if (ltsig in rt.types) {
@@ -309,7 +317,7 @@ function registerInteractiveCstdio() {
 
       const validate_format = function (rt: any, format: string, ...params: any[]) {
         let i = 0
-        const re = /%(?:[-+ #0])?(?:[0-9]+|\*)?(?:\.(?:[0-9]+|\*))?([diuoxXfFeEgGaAcspn])/g
+        const re = /%(?:[-+ #0])?(?:[0-9]+|\*)?(?:\.(?:[0-9]+|\*))?(?:l|ll|h|hh|z)?([diuoxXfFeEgGaAcspn])/g
         let ctrl: any
         const result: any[] = []
         while ((ctrl = re.exec(format)) != null) {
@@ -433,6 +441,7 @@ addEventListener('message', (e: MessageEvent) => {
         throw new Error('JSCPP execution engine could not be initialized.')
       }
 
+      setupStandardHeaders(JSCPP.includes)
       registerInteractiveCstdio()
 
       inputStream = stdin || ''
@@ -451,14 +460,20 @@ addEventListener('message', (e: MessageEvent) => {
         includes: JSCPP.includes
       }
 
+      const structSizes: Record<string, number> = {}
       const rt = new CRuntime(_config)
-      const parsedCode = preprocessor.parse(rt, code)
+      patchRuntime(rt, structSizes)
+      extractAndRegisterStructs(rt, code, structSizes)
+
+      const preparedCode = prepareSourceCode(code)
+      const parsedCode = preprocessor.parse(rt, preparedCode)
       const result = PEGUtil.parse(ast, parsedCode)
       if (result.error != null) {
         throw new Error('ERROR: Parsing Failure:\n' + PEGUtil.errorMessage(result.error, true))
       }
 
       const interpreter = new Interpreter(rt)
+      patchInterpreter(interpreter)
       const defGen = interpreter.run(result.ast, parsedCode)
       while (true) {
         const step = defGen.next()
