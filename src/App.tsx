@@ -84,25 +84,6 @@ export default function App() {
   const editorViewRef = useRef<EditorView | null>(null)
   const liveInputRef = useRef<HTMLInputElement>(null)
 
-  const sabRef = useRef<SharedArrayBuffer | null>(null)
-  const sabStatusRef = useRef<Int32Array | null>(null)
-  const sabLengthRef = useRef<Int32Array | null>(null)
-  const sabCharBufferRef = useRef<Uint8Array | null>(null)
-
-  useEffect(() => {
-    if (typeof SharedArrayBuffer !== 'undefined') {
-      try {
-        const sab = new SharedArrayBuffer(1024)
-        sabRef.current = sab
-        sabStatusRef.current = new Int32Array(sab, 0, 1)
-        sabLengthRef.current = new Int32Array(sab, 4, 1)
-        sabCharBufferRef.current = new Uint8Array(sab, 8, 1016)
-      } catch (e) {
-        console.warn('SharedArrayBuffer not available:', e)
-      }
-    }
-  }, [])
-
   const activeFile = files[Math.min(activeIdx, files.length - 1)]
 
   const scrollOutput = () => {
@@ -275,7 +256,6 @@ export default function App() {
       type: 'run',
       code: source,
       stdin: stdinInput,
-      sab: sabRef.current,
     })
   }
 
@@ -286,19 +266,17 @@ export default function App() {
     setConsoleOutput(p => p + liveInputValue + '\n')
     scrollOutput()
 
-    if (sabStatusRef.current && sabLengthRef.current && sabCharBufferRef.current) {
-      const enc = new TextEncoder().encode(inputToSend)
-      sabLengthRef.current[0] = enc.length
-      sabCharBufferRef.current.set(enc)
-      Atomics.store(sabStatusRef.current, 0, 1)
-      Atomics.notify(sabStatusRef.current, 0, 1)
-    }
+    workerRef.current?.postMessage({
+      type: 'stdin_response',
+      text: inputToSend,
+    })
 
     setLiveInputValue('')
     setIsWaitingForInput(false)
   }
 
   const stopCode = () => {
+    workerRef.current?.postMessage({ type: 'stop' })
     workerRef.current?.terminate()
     setConsoleOutput(p => p + '\n[Stopped by user.]')
     setIsRunning(false)
@@ -558,7 +536,11 @@ export default function App() {
             <div className="flex items-center justify-between pb-3 border-b border-theme mb-3 flex-shrink-0">
               <span className="accent-text font-mono font-bold flex items-center gap-2 text-sm">
                 &gt;_ Terminal
-                {isRunning && <span className="text-xs text-amber-400 animate-pulse">● Running</span>}
+                {isRunning && (
+                  <span className="text-xs text-amber-400 animate-pulse">
+                    {isWaitingForInput ? '⌨ Waiting for Input...' : '● Running'}
+                  </span>
+                )}
               </span>
               <div className="flex gap-2">
                 {isRunning && <button onClick={stopCode} className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-md">■ Stop</button>}
@@ -572,8 +554,32 @@ export default function App() {
               className="flex-1 min-h-0 font-mono overflow-y-auto whitespace-pre-wrap leading-relaxed p-3.5 app-bg rounded-lg border border-theme"
               style={{ color: consoleIsError ? '#f87171' : '#34d399', fontSize: `${termFontSize}px` }}
             >
-              {consoleOutput || 'Click ▶ Run to execute.\n\nTip: Pre-fill scanf inputs in Settings → Terminal before running.'}
+              {consoleOutput || 'Click ▶ Run to execute.\n\nTip: You can enter scanf inputs live in the terminal or pre-fill in Settings → Terminal.'}
             </pre>
+
+            {isWaitingForInput && (
+              <form onSubmit={handleSendLiveInput} className="mt-3 flex items-center gap-2 flex-shrink-0">
+                <div className="flex-1 flex items-center sub-bg rounded-xl border border-emerald-400/80 px-3 py-2 shadow-md focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-400/30">
+                  <span className="text-emerald-400 font-mono text-sm font-bold mr-2 select-none">&gt;</span>
+                  <input
+                    ref={liveInputRef}
+                    type="text"
+                    value={liveInputValue}
+                    onChange={e => setLiveInputValue(e.target.value)}
+                    placeholder="Enter input here (scanf) and tap Send..."
+                    className="w-full bg-transparent outline-none text-sm font-mono text-white placeholder:text-zinc-500"
+                    autoFocus
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="accent-bg text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition-all"
+                >
+                  <span>Send</span>
+                  <span>↵</span>
+                </button>
+              </form>
+            )}
           </div>
         )}
 

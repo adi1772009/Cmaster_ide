@@ -103,37 +103,40 @@ jobs:
         run: |
           ls -la android/app/build/outputs/apk/debug/
           test -f android/app/build/outputs/apk/debug/app-debug.apk
-          cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/Cmaster-v1.0.0.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/Cmaster-Mark-2.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/Cmaster.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Cmaster-Offline-APK
-          path: android/app/build/outputs/apk/debug/Cmaster-v1.0.0.apk
+          name: Cmaster-Mark-2-APK
+          path: android/app/build/outputs/apk/debug/Cmaster-Mark-2.apk
           retention-days: 30
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.0
-          name: "Cmaster Offline C IDE v1.0.0 (Android APK)"
+          tag_name: v2.0.0
+          name: "Cmaster Offline C IDE Mark 2 (Android APK)"
           body: |
-            ## Cmaster IDE v1.0.0 for Android 🚀
+            ## Cmaster IDE Mark 2 (v2.0.0) for Android 🚀
             
-            Offline Mobile C Programming IDE.
+            The Complete Offline Mobile C Programming IDE — Mark 2.
             
-            ### What's Included:
-            - **100% Offline C Execution Engine**: Run complex C code, pointers, data structures, and deep recursion (Tower of Hanoi, QuickSort, N-Queens, Binary Search Trees) directly on device without internet or remote servers.
-            - **Intelligent Autocomplete**: Full C language keyword, stdlib, snippet completions, and document symbol suggestions in the editor.
-            - **Full Device File Access**: Save, Save As, and Open files directly on your device storage.
-            - **Interactive Console & Stdin**: Real-time terminal with live user input bar and 60-second runtime limit with recursion stack overflow detection.
+            ### What's New in Mark 2:
+            - **Real-Time Interactive Terminal I/O**: Direct in-terminal input for `scanf`, `getchar`, and `gets`! Programs prompt interactively and continue execution upon pressing Enter.
+            - **Universal Generator-Based Execution Engine**: Zero dependency on SharedArrayBuffer or cross-origin headers — works on 100% of Android devices and WebViews.
+            - **Complex Recursion & Data Structures**: Tower of Hanoi, QuickSort with pointer arithmetic, N-Queens backtracking, Binary Search Trees, and dynamic memory.
+            - **Intelligent C Autocomplete**: CodeMirror 6 with C keywords, standard library headers, and smart snippet suggestions.
+            - **100% Offline Standalone Package**: Self-contained APK (~73 MB) with complete C standard library headers, runtime datasets, and custom branding.
             
             ### Download:
-            Download **Cmaster-v1.0.0.apk** below and tap to install on your Android device.
+            Download **Cmaster-Mark-2.apk** (or **Cmaster.apk**) below and tap to install on your Android device.
           draft: false
           prerelease: false
           files: |
-            android/app/build/outputs/apk/debug/Cmaster-v1.0.0.apk
+            android/app/build/outputs/apk/debug/Cmaster-Mark-2.apk
+            android/app/build/outputs/apk/debug/Cmaster.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
