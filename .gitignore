@@ -1,0 +1,18 @@
+# Gradle and build outputs
+.gradle/
+build/
+app/build/
+*.apk
+*.aab
+local.properties
+
+# Node & web dependencies
+node_modules/
+dist/
+.vite/
+
+# OS / IDE
+.idea/
+*.iml
+.DS_Store
+Thumbs.db

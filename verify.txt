@@ -1,0 +1,93 @@
+========================================================================
+C IDE DRY-RUN INTEGRATION TEST SUITE & PROBLEM SET
+========================================================================
+
+------------------------------------------------------------------------
+SECTION 1: SYLLABUS & PRACTICAL LAB PROBLEMS (GTU Data Structures)
+------------------------------------------------------------------------
+[cite: 1]
+
+-- Syllabus Suggested Practical List --
+1. Find maximum out of 10 numbers using an array and calculate time complexity.[cite: 1]
+2. Implement push and pop algorithms on a Stack.[cite: 1]
+3. Implement recursive functions (Factorial calculation).[cite: 1]
+4. Implement insert and delete algorithms of a Queue.[cite: 1]
+5. Implement simple structure programs using pointers.[cite: 1]
+6. Implement insertion of a node in a Singly Linked List.[cite: 1]
+7. Implement deletion of a node from a Singly Linked List.[cite: 1]
+8. Implement counting total number of nodes in a Singly Linked List.[cite: 1]
+9. Implement searching for a specific node in a Singly Linked List.[cite: 1]
+10. Implement construction of a Binary Search Tree (BST).[cite: 1]
+11. Implement Bubble Sort algorithm.[cite: 1]
+12. Implement Selection Sort algorithm.[cite: 1]
+13. Implement Insertion Sort algorithm.[cite: 1]
+14. Implement Binary Search algorithm.[cite: 1]
+
+-- Syllabus Suggested Projects --
+15. Evaluate a given arithmetic expression (Infix to Postfix / Postfix evaluation) using Stack.[cite: 1]
+16. Maintain a queue of persons with operations to add, delete, and search a person.[cite: 1]
+17. Simulate banking operations (withdraw cash, deposit cash, mini statement) using appropriate data structures.[cite: 1]
+18. Implement a Process Management / CPU Scheduling algorithm using an appropriate data structure.[cite: 1]
+19. Implement a Print Spooler system using Queue data structures.[cite: 1]
+20. Develop a Telephone Directory System allowing adding, searching, modifying, listing, and deleting records.[cite: 1]
+
+-- Additional Course Core Content Tasks --
+21. Row Major and Column Major 2D Array address mapping and traversal.[cite: 1]
+22. Circular Queue insertion and deletion operations.[cite: 1]
+23. Infix to Prefix conversion using Stack.[cite: 1]
+24. Recursive Greatest Common Divisor (GCD) using Euclidean Algorithm.[cite: 1]
+25. Recursive Fibonacci series generation.[cite: 1]
+26. Doubly Linked List node insertion and deletion.[cite: 1]
+27. Circular Linked List node insertion and deletion.[cite: 1]
+28. Binary Search Tree (BST) traversals: Inorder, Preorder, Postorder.[cite: 1]
+29. Binary Search Tree (BST) node deletion.[cite: 1]
+30. Quick Sort algorithm implementation.[cite: 1]
+31. Merge Sort algorithm implementation.[cite: 1]
+32. Radix Sort algorithm implementation.[cite: 1]
+33. Hash table implementation using Division Method, Mid-Square Method, and Folding Method for key mapping.[cite: 1]
+
+
+------------------------------------------------------------------------
+SECTION 2: STANDARD C IDE COMPREHENSIVE VERIFICATION SUITE
+------------------------------------------------------------------------
+
+-- Standard I/O and File Handling (<stdio.h>) --
+34. Read formatted student records from a text file, compute averages, and write to an output file.
+35. Perform binary file reading and writing of struct arrays using fread and fwrite.
+36. Redirect standard input/output streams and test custom buffer sizes using setvbuf.
+
+-- Memory Management & Utilities (<stdlib.h>, <stddef.h>) --
+37. Allocate dynamic multi-dimensional arrays using malloc, calloc, realloc, and properly deallocate with free.
+38. Implement generic sorting using standard qsort with custom struct comparison callbacks.
+39. Implement dynamic binary search using standard bsearch function.
+
+-- String & Memory Manipulation (<string.h>, <wchar.h>) --
+40. String tokenization and parsing using strtok and strsep.
+41. Low-level memory block manipulation using memcpy, memmove, memset, and memcmp.
+42. Wide character string processing using wchar_t and wprintf.
+
+-- Mathematical & Complex Computations (<math.h>, <complex.h>, <tgmath.h>) --
+43. Compute trigonometric, logarithmic, exponential, and power functions with error checks.
+44. Perform arithmetic calculations on complex numbers using double _Complex types.
+
+-- Bitwise Operations & Byte Representation (<stdbit.h>, <stdint.h>) --
+45. Standard fixed-width integer operations (uint8_t, int64_t) with bitwise rotations and masking.
+46. Count leading zeros, trailing zeros, and bit population count using C23 <stdbit.h> features.
+47. Safe integer arithmetic overflow detection using C23 <stdckdint.h> macros (ckd_add, ckd_mul).
+
+-- Low-Level Control Flow & Signal Handling (<setjmp.h>, <signal.h>) --
+48. Implement error recovery mechanism across deep function calls using setjmp and longjmp.
+49. Register custom signal handlers for SIGINT and SIGFPE to capture user interrupts and divide-by-zero.
+
+-- Multi-Threading & Synchronization (<threads.h>, <stdatomic.h>) --
+50. Multi-threaded matrix multiplication using C11 threads (thrd_create, thrd_join).
+51. Thread synchronization using mutexes (mtx_lock, mtx_unlock) and condition variables.
+52. Lock-free counter implementation using atomic variables and memory ordering directives.
+
+-- Time, Date & Benchmarking (<time.h>) --
+53. High-resolution execution timing of algorithm performance using clock_gettime / timespec_get.
+54. Calendar date-time formatting and conversion using time_t, struct tm, and strftime.
+
+-- Diagnostics & Assertions (<assert.h>, <errno.h>) --
+55. Runtime verification testing using assert macro and static assertions using static_assert.
+56. System error logging using errno, perror, and strerror.
