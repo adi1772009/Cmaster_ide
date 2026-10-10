@@ -57,6 +57,6 @@ android {
 }
 
 dependencies {
-    // No external dependencies - pure Android SDK
-    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.webkit)
 }

@@ -24,14 +24,28 @@ object TccExtractor {
     }
 
     private fun extractAssetFolder(context: Context, assetPath: String, destDir: File) {
-        val assets = context.assets.list(assetPath) ?: return
-        if (assets.isEmpty()) {
-            copyAsset(context, assetPath, File(destDir, assetPath.substringAfterLast("/")))
+        val assets = try { context.assets.list(assetPath) } catch (e: Exception) { null }
+        if (assets.isNullOrEmpty()) {
+            // Check if it's a file by attempting to open it
+            try {
+                context.assets.open(assetPath).close()
+                copyAsset(context, assetPath, File(destDir, assetPath.substringAfterLast("/")))
+            } catch (e: Exception) {
+                // Empty directory or unreadable
+            }
         } else {
+            // It's a directory containing files or sub-directories
             val subDir = File(destDir, assetPath.substringAfterLast("/"))
             subDir.mkdirs()
             for (asset in assets) {
-                extractAssetFolder(context, "$assetPath/$asset", subDir)
+                val childAssetPath = if (assetPath.isEmpty()) asset else "$assetPath/$asset"
+                // Check if child is file or directory
+                val childList = try { context.assets.list(childAssetPath) } catch (e: Exception) { null }
+                if (childList.isNullOrEmpty()) {
+                    copyAsset(context, childAssetPath, File(subDir, asset))
+                } else {
+                    extractAssetFolder(context, childAssetPath, destDir)
+                }
             }
         }
     }

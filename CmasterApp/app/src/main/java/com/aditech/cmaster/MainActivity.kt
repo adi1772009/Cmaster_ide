@@ -1,20 +1,19 @@
 package com.aditech.cmaster
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.webkit.ConsoleMessage
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import androidx.webkit.WebViewAssetLoader
+import androidx.webkit.WebViewClientCompat
 
-/**
- * MainActivity - hosts the full-screen WebView loading the React UI.
- *
- * Phase 2: Triggers TCC asset extraction on first launch (before WebView loads).
- * Phase 3: Registers CompilerBridge as JavaScript interface ("Android").
- */
 class MainActivity : AppCompatActivity() {
 
     companion object {
@@ -23,6 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private lateinit var bridge: CompilerBridge
+    private lateinit var assetLoader: WebViewAssetLoader
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,8 +32,10 @@ class MainActivity : AppCompatActivity() {
         webView = findViewById(R.id.webView)
         bridge = CompilerBridge(this, webView)
 
-        // Phase 2: Extract TCC support files on first launch
-        // Runs on a background thread, but WebView load happens after
+        assetLoader = WebViewAssetLoader.Builder()
+            .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
+            .build()
+
         Thread {
             try {
                 TccExtractor.extractIfNeeded(this)
@@ -55,22 +57,34 @@ class MainActivity : AppCompatActivity() {
             allowFileAccess = true
             allowContentAccess = true
             mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-            cacheMode = WebSettings.LOAD_NO_CACHE
+            cacheMode = WebSettings.LOAD_DEFAULT
             databaseEnabled = true
-            // Needed for CodeMirror and modern JS features
-            javaScriptCanOpenWindowsAutomatically = false
+            javaScriptCanOpenWindowsAutomatically = true
             mediaPlaybackRequiresUserGesture = false
+            loadWithOverviewMode = true
+            useWideViewPort = true
         }
 
-        // Phase 3: Register the compiler bridge as "Android" in JavaScript
-        // The React app checks: if (window.Android) { use native bridge }
         webView.addJavascriptInterface(bridge, "Android")
 
-        webView.webViewClient = object : WebViewClient() {
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+                Log.d("CmasterJS", "${consoleMessage?.message()} -- From line ${consoleMessage?.lineNumber()} of ${consoleMessage?.sourceId()}")
+                return true
+            }
+        }
+
+        webView.webViewClient = object : WebViewClientCompat() {
+            override fun shouldInterceptRequest(
+                view: WebView,
+                request: WebResourceRequest
+            ): WebResourceResponse? {
+                return assetLoader.shouldInterceptRequest(request.url)
+            }
+
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-                // Keep all navigation within WebView (file:// URLs)
                 val url = request.url.toString()
-                return !url.startsWith("file://")
+                return !url.startsWith("https://appassets.androidplatform.net/") && !url.startsWith("file://")
             }
 
             override fun onPageFinished(view: WebView, url: String) {
@@ -79,13 +93,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Load the React app from assets
-        // Vite build is configured with base='./' so asset paths are relative
-        webView.loadUrl("file:///android_asset/www/index.html")
+        webView.loadUrl("https://appassets.androidplatform.net/assets/www/index.html")
     }
 
     override fun onBackPressed() {
-        // Navigate back in WebView history if possible
         if (webView.canGoBack()) {
             webView.goBack()
         } else {
@@ -99,3 +110,4 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 }
+

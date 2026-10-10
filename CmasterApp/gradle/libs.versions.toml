@@ -3,7 +3,8 @@ agp = "8.7.0"
 kotlin = "2.0.21"
 
 [libraries]
-# No external libraries needed - using only Android SDK
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.0" }
+androidx-webkit = { module = "androidx.webkit:webkit", version = "1.12.1" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

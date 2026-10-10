@@ -112,27 +112,29 @@ export default function App() {
 
   // ─── JSCPP Worker message handler (web fallback) ──────────────────────────
   const handleWorkerMessage = useCallback((e: MessageEvent) => {
-    const { type, text, exitCode } = e.data
+    const { type, text, exitCode } = e.data || {}
     if (type === 'output') {
-      setConsoleOutput(p => p + text)
+      setConsoleOutput(p => p + (text || ''))
       scrollOutput()
     } else if (type === 'done') {
-      setConsoleOutput(p => p + `\n${'─'.repeat(40)}\nProcess exited with code ${exitCode}.`)
+      setConsoleOutput(p => p + `\n${'─'.repeat(40)}\nProcess exited with code ${exitCode ?? 0}.`)
       setIsRunning(false)
     } else if (type === 'error') {
-      setConsoleOutput(p => p + text)
+      setConsoleOutput(p => p + (text || ''))
       setConsoleIsError(true)
       setIsRunning(false)
     }
   }, [])
 
   const spawnWorker = useCallback(() => {
-    // Don't spawn JSCPP worker on Android - we use the native bridge instead
     if (isAndroidBridge) return null
     try {
-      const w = new Worker(new URL('./workers/compiler.worker.ts', import.meta.url), { type: 'module' })
-      w.addEventListener('message', handleWorkerMessage)
-      return w
+      if (typeof Worker !== 'undefined') {
+        const w = new Worker(new URL('./workers/compiler.worker.ts', import.meta.url), { type: 'module' })
+        w.addEventListener('message', handleWorkerMessage)
+        return w
+      }
+      return null
     } catch {
       return null
     }
@@ -140,7 +142,10 @@ export default function App() {
 
   useEffect(() => {
     workerRef.current = spawnWorker()
-    return () => workerRef.current?.terminate()
+    return () => {
+      workerRef.current?.terminate()
+      workerRef.current = null
+    }
   }, [spawnWorker])
 
   // ─── Android bridge callback registration (Phase 3 + 4) ──────────────────
