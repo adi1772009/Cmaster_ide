@@ -45,7 +45,7 @@ jobs:
 
       - name: Copy & Rename APK
         run: |
-          cp CmasterApp/app/build/outputs/apk/release/app-release.apk Cmaster-Mark6.apk
+          cp CmasterApp/app/build/outputs/apk/release/app-release.apk Cmaster-Mark6.2.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -59,11 +59,12 @@ jobs:
             - **Native Linking:** Full standard C header library resolution (`stdio.h`, `stdlib.h`, `math.h`, etc.) & Bionic CRT linking.
             - **Interactive Mobile Terminal:** Full interactive `stdin` / `scanf` support and simulated terminal sandbox.
             - **Modern Editor:** CodeMirror 6 with syntax highlighting, compiler error highlights, and touch optimizations.
+            - **Storage Access Framework (SAF):** Seamless file browsing and saving from secondary storage (SD cards & internal memory).
             
             ### Installation
-            Download `Cmaster-Mark6.apk` below, install on your Android device (ARM64), and code offline anywhere!
+            Download `Cmaster-Mark6.2.apk` below, install on your Android device (ARM64), and code offline anywhere!
           files: |
-            Cmaster-Mark6.apk
+            Cmaster-Mark6.2.apk
             CmasterApp/app/build/outputs/apk/release/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
